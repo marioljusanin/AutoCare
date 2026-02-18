@@ -13,11 +13,11 @@ import java.util.Date
         ForeignKey(
             entity = Vehicle::class,
             parentColumns = ["vehicleID"],
-            childColumns = ["vehicelID"],
+            childColumns = ["vehicleID"],
             onDelete = ForeignKey.Companion.CASCADE
         )
     ],
-    indices = [Index("userID")]
+    indices = [Index("vehicleID")]
 )
 data class Service(
 

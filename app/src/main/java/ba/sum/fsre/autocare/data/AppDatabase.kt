@@ -3,6 +3,11 @@ package ba.sum.fsre.autocare.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import ba.sum.fsre.autocare.dao.ExpenseDao
+import ba.sum.fsre.autocare.dao.ReminderDao
+import ba.sum.fsre.autocare.dao.ServiceDao
+import ba.sum.fsre.autocare.dao.UserDao
+import ba.sum.fsre.autocare.dao.VehicleDao
 
 @Database(
     entities = [
@@ -20,4 +25,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     // Ovdje kasnije dodaš DAO-e, npr.:
     // abstract fun korisnikDao(): KorisnikDao
+
+    abstract fun vehicleDao(): VehicleDao
+
+    abstract fun userDao(): UserDao
+
+    abstract fun serviceDao(): ServiceDao
+
+    abstract fun reminderDao(): ReminderDao
+
+    abstract fun expenseDao(): ExpenseDao
+
 }

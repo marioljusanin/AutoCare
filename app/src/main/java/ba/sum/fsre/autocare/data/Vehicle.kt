@@ -32,3 +32,9 @@ data class Vehicle(
     val userID: Int
 
 )
+//----------  OVO JE SAMO PRIMJER DA VIDIM JEL RADI --------------
+object DummyVehicle{
+
+
+    val vehicle = listOf(Vehicle( 0, "BMW", "320d", "2002", 2000, "12/2026", 0 ))
+}
