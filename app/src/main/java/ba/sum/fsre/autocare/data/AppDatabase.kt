@@ -17,14 +17,13 @@ import ba.sum.fsre.autocare.dao.VehicleDao
       Expense::class,
       Reminder::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    // Ovdje kasnije dodaš DAO-e, npr.:
-    // abstract fun korisnikDao(): KorisnikDao
+
 
     abstract fun vehicleDao(): VehicleDao
 

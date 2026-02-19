@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AutoCare</string>
+    <string name="update_vehicle">Update Vehicle</string>
+    <string name="add_vehicle">Add Vehicle</string>
 </resources>

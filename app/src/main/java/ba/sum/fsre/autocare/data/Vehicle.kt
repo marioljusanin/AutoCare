@@ -6,8 +6,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "vehicle",
-    foreignKeys = [
+    tableName = "vehicle"
+   /* foreignKeys = [
         ForeignKey(
             entity = User::class,
             parentColumns = ["userID"],
@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.Companion.CASCADE
         )
     ],
-    indices = [Index("userID")]
+    indices = [Index("userID")]*/
 )
 
 data class Vehicle(
@@ -26,15 +26,9 @@ data class Vehicle(
     val name: String,
     val model: String,
     val year: String,
-    val mileage: Int,
+    val mileage: String,
     val registration: String,
 
-    val userID: Int
+    //val userID: Int = 0
 
 )
-//----------  OVO JE SAMO PRIMJER DA VIDIM JEL RADI --------------
-object DummyVehicle{
-
-
-    val vehicle = listOf(Vehicle( 0, "BMW", "320d", "2002", 2000, "12/2026", 0 ))
-}

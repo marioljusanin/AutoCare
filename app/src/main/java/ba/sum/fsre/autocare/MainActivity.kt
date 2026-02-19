@@ -12,18 +12,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ba.sum.fsre.autocare.data.Vehicle
+import ba.sum.fsre.autocare.screen.AddVehicleScreen
 import ba.sum.fsre.autocare.screen.HomeScreen
 import ba.sum.fsre.autocare.ui.theme.AutoCareTheme
+import ba.sum.fsre.autocare.viewModel.VehicleViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             AutoCareTheme {
                 Surface (modifier = Modifier.fillMaxSize()) {
 
-                    HomeScreen()
+                    Navigation()
+                    //HomeScreen()
+
 
                 }
             }

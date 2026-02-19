@@ -35,7 +35,8 @@ object Graph {
 
 
     fun provide(context: Context){
-        database = Room.databaseBuilder(context, AppDatabase::class.java, "autocare.db").build()
+        database = Room.databaseBuilder(context, AppDatabase::class.java, "autocare.db").fallbackToDestructiveMigration()
+            .build()
     }
 
 }
