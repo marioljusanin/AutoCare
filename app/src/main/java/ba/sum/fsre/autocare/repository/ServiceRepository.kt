@@ -18,7 +18,7 @@ class ServiceRepository(private val serviceDao: ServiceDao) {
         serviceDao.deleteService(service)
     }
 
-    fun getAlService(): Flow<List<Service>> = serviceDao.getAllService()
+    fun getAllService(): Flow<List<Service>> = serviceDao.getAllService()
 
     fun getServiceByID(id:Int): Flow<Service>{
         return serviceDao.getServiceByID(id)

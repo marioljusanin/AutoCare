@@ -88,7 +88,9 @@ fun HomeScreen(
                 Text("My Vehicles", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.weight(1f))
 
-                FilledTonalIconButton(onClick = {}) {
+                FilledTonalIconButton(onClick = {
+                    navController.navigate("add_service")
+                }) {
                     Icon(Icons.Default.Build, contentDescription = "Add service/expense")
                 }
                 IconButton(onClick = {
@@ -108,6 +110,8 @@ fun HomeScreen(
                 items(vehiclesList.value) { vehicle ->
                     VehicleItem(vehicle = vehicle) {
                         val id = vehicle.vehicleID
+                        android.util.Log.d("NAV", "graph routes = ${navController.graph.nodes}")
+                        android.util.Log.d("NAV", "navigate to add_vehicle/${id}")
                         navController.navigate("add_vehicle/${id}")
                     }
                 }

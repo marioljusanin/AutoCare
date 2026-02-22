@@ -25,11 +25,11 @@ object Graph {
         ServiceRepository(serviceDao = database.serviceDao())
     }
 
-    val ReminderRepository by lazy{
+    val reminderRepository by lazy{
         ReminderRepository( reminderDao = database.reminderDao())
     }
 
-    val ExpenseRepository by lazy{
+    val expenseRepository by lazy{
         ExpenseRepository(expenseDao = database.expenseDao())
     }
 

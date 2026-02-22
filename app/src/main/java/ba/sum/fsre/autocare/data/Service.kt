@@ -24,10 +24,10 @@ data class Service(
     @PrimaryKey(autoGenerate = true)
     val serviceID: Int = 0,
 
-    val date: Date,
+    val date: String,
     val description: String,
     val type: String,
-    val price: Double,
+    val price: String,
 
     val vehicleID: Int        // FK na Vozilo
 )

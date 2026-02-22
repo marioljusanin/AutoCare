@@ -11,16 +11,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ba.sum.fsre.autocare.screen.AddServiceScreen
 import ba.sum.fsre.autocare.screen.AddVehicleScreen
 import ba.sum.fsre.autocare.screen.HomeScreen
 import ba.sum.fsre.autocare.screen.Screen
+import ba.sum.fsre.autocare.viewModel.ServiceViewModel
 import java.util.Map.entry
 
 
 @Composable
 fun Navigation(
     viewModel: VehicleViewModel = viewModel(),
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    serviceViewModel: ServiceViewModel = viewModel()
 ){
     NavHost(
         navController = navController,
@@ -28,6 +31,9 @@ fun Navigation(
     ){
         composable("home_screen"){
             HomeScreen(viewModel, navController)
+        }
+        composable("add_service"){
+            AddServiceScreen(navController, serviceViewModel)
         }
         composable("add_vehicle/{id}",
             arguments = listOf(
@@ -41,6 +47,8 @@ fun Navigation(
             val id = if(entry.arguments != null) entry.arguments!!.getInt("id") else 0
             AddVehicleScreen(id, viewModel, navController)
         }
+
+
     }
 }
 

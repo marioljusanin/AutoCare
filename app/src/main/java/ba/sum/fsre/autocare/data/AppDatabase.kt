@@ -17,7 +17,7 @@ import ba.sum.fsre.autocare.dao.VehicleDao
       Expense::class,
       Reminder::class
     ],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
