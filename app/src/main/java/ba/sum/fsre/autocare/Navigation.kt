@@ -16,6 +16,7 @@ import ba.sum.fsre.autocare.screen.AddVehicleScreen
 import ba.sum.fsre.autocare.screen.CarServicesScreen
 import ba.sum.fsre.autocare.screen.EditServiceScreen
 import ba.sum.fsre.autocare.screen.HomeScreen
+import ba.sum.fsre.autocare.screen.TotalCostsScreen
 import ba.sum.fsre.autocare.screen.Screen
 import ba.sum.fsre.autocare.viewModel.ServiceViewModel
 import java.util.Map.entry
@@ -33,6 +34,12 @@ fun Navigation(
     ){
         composable("home_screen"){
             HomeScreen(viewModel, serviceViewModel, navController)
+        }
+        composable("total_costs") {
+            TotalCostsScreen(
+                serviceViewModel = serviceViewModel,
+                navController = navController
+            )
         }
         composable("add_service"){
             AddServiceScreen(navController, serviceViewModel)

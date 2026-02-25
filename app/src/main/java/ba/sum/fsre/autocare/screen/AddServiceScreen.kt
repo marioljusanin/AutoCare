@@ -148,7 +148,8 @@ private val SERVICE_TYPES = listOf(
     "Mali Servis",
     "Veliki Servis",
     "Popravak",
-    "Gorivo"
+    "Gorivo",
+    "Others"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

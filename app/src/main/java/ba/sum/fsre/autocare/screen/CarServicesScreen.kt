@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -106,7 +107,8 @@ fun CarServicesScreen(
                     items(services) { service ->
                         ServiceItem(
                             service = service,
-                            onClick = { navController.navigate("edit_service/${service.serviceID}") }
+                            onClick = { navController.navigate("edit_service/${service.serviceID}") },
+                            onDelete = { serviceViewModel.deleteService(service) }
                         )
                     }
                 }
@@ -118,7 +120,8 @@ fun CarServicesScreen(
 @Composable
 private fun ServiceItem(
     service: Service,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -129,16 +132,25 @@ private fun ServiceItem(
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = service.type,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "${service.price}",
-                    style = MaterialTheme.typography.titleSmall
-                )
+                Column {
+                    Text(
+                        text = service.type,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "${service.price}",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete service"
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(

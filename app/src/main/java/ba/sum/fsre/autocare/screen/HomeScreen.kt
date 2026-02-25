@@ -74,13 +74,19 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             val services by serviceViewModel.getAllService.collectAsState(initial = emptyList())
             val nextServiceInfo = remember(services) { computeNextServiceInfo(services) }
+            val totalCostsText = remember(services) { computeTotalCostsText(services) }
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 StatCard(
                     title = "Total Costs",
-                    value = "100",
-                    modifier = Modifier.weight(1f)
+                    value = totalCostsText,
+                    modifier = Modifier.weight(1f),
+                    onClick = if (services.isNotEmpty()) {
+                        { navController.navigate("total_costs") }
+                    } else {
+                        null
+                    }
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 StatCard(
@@ -144,14 +150,25 @@ private data class NextServiceInfo(val text: String, val service: Service?)
 private fun computeNextServiceInfo(services: List<Service>): NextServiceInfo {
     if (services.isEmpty()) return NextServiceInfo(" - ", null)
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val today = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }
+    val today = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
     val todayMillis = today.timeInMillis
     var minDays: Long? = null
     var nextService: Service? = null
     for (service in services) {
         try {
             val parsed = dateFormat.parse(service.date) ?: continue
-            val serviceCal = Calendar.getInstance().apply { time = parsed; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }
+            val serviceCal = Calendar.getInstance().apply {
+                time = parsed
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
             val serviceMillis = serviceCal.timeInMillis
             if (serviceMillis >= todayMillis) {
                 val days = (serviceMillis - todayMillis) / (24 * 60 * 60 * 1000)
@@ -160,7 +177,8 @@ private fun computeNextServiceInfo(services: List<Service>): NextServiceInfo {
                     nextService = service
                 }
             }
-        } catch (_: Exception) { }
+        } catch (_: Exception) {
+        }
     }
     val text = when {
         minDays == null -> " - "
@@ -169,6 +187,24 @@ private fun computeNextServiceInfo(services: List<Service>): NextServiceInfo {
         else -> "$minDays days"
     }
     return NextServiceInfo(text, nextService)
+}
+
+private fun computeTotalCostsText(services: List<Service>): String {
+    if (services.isEmpty()) return "0"
+    var total = 0.0
+    for (service in services) {
+        // Allow both "100" and "100,50" formats
+        val normalized = service.price.replace(',', '.')
+        val value = normalized.toDoubleOrNull() ?: continue
+        total += value
+    }
+    if (total == 0.0) return "0"
+    // Show without decimals when it's a whole number, otherwise two decimals
+    return if (total % 1.0 == 0.0) {
+        total.toLong().toString()
+    } else {
+        String.format(Locale.getDefault(), "%.2f", total)
+    }
 }
 
 @Composable
