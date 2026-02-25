@@ -1,6 +1,8 @@
 package ba.sum.fsre.autocare.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -30,7 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ba.sum.fsre.autocare.data.Service
@@ -39,6 +45,12 @@ import ba.sum.fsre.autocare.viewModel.ServiceViewModel
 import java.util.Locale
 
 private data class CostSummary(
+    val total: Double
+)
+
+private data class TypeCostPerCar(
+    val type: String,
+    val perCar: Map<Int, Double>,
     val total: Double
 )
 
@@ -52,12 +64,130 @@ private fun calculateCostSummary(services: List<Service>): CostSummary {
     return CostSummary(total)
 }
 
+private fun buildTypeCostPerCar(services: List<Service>): List<TypeCostPerCar> {
+    val byType: MutableMap<String, MutableMap<Int, Double>> = mutableMapOf()
+    for (service in services) {
+        val normalized = service.price.replace(',', '.')
+        val value = normalized.toDoubleOrNull() ?: continue
+        val perCar = byType.getOrPut(service.type) { mutableMapOf() }
+        perCar[service.vehicleID] = (perCar[service.vehicleID] ?: 0.0) + value
+    }
+    return byType.map { (type, perCar) ->
+        val total = perCar.values.sum()
+        TypeCostPerCar(type = type, perCar = perCar, total = total)
+    }.sortedBy { it.type }
+}
+
 private fun Double.toAmountString(): String {
     if (this == 0.0) return "0"
     return if (this % 1.0 == 0.0) {
         this.toLong().toString()
     } else {
         String.format(Locale.getDefault(), "%.2f", this)
+    }
+}
+
+@Composable
+private fun TypeCostsGraph(
+    data: List<TypeCostPerCar>,
+    vehicles: List<Vehicle>
+) {
+    if (data.isEmpty() || vehicles.isEmpty()) return
+
+    // Assign a distinct color per car (cycled if there are many)
+    val palette = listOf(
+        Color(0xFF1E88E5),
+        Color(0xFFD81B60),
+        Color(0xFF43A047),
+        Color(0xFFFB8C00),
+        Color(0xFF8E24AA),
+        Color(0xFF00838F)
+    )
+    val carColors = remember(vehicles) {
+        val map = mutableMapOf<Int, Color>()
+        vehicles.forEachIndexed { index, vehicle ->
+            map[vehicle.vehicleID] = palette[index % palette.size]
+        }
+        map
+    }
+
+    val barMaxHeight = 120.dp
+    val maxTotal = data.maxOf { it.total }.coerceAtLeast(1.0)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(barMaxHeight + 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            data.forEach { typeData ->
+                val heightFraction = (typeData.total / maxTotal).toFloat().coerceIn(0f, 1f)
+                val barHeight = (barMaxHeight.value * heightFraction).dp
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(barHeight)
+                    ) {
+                        val segments = typeData.perCar.entries.sortedByDescending { it.value }
+                        segments.forEach { (vehicleId, cost) ->
+                            val segFraction =
+                                if (typeData.total == 0.0) 0f else (cost / typeData.total).toFloat()
+                            val segHeight = (barHeight.value * segFraction).dp
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(segHeight)
+                                    .background(
+                                        carColors[vehicleId]
+                                            ?: MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    )
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = typeData.type,
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        // Legend
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            vehicles.forEach { vehicle ->
+                val color = carColors[vehicle.vehicleID] ?: return@forEach
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(12.dp)
+                            .height(12.dp)
+                            .background(color)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "${vehicle.name} ${vehicle.model}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -84,6 +214,7 @@ fun TotalCostsScreen(
         current
     }
     val costSummary = remember(filteredServices) { calculateCostSummary(filteredServices) }
+    val typeCostData = remember(filteredServices) { buildTypeCostPerCar(filteredServices) }
     var filterMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -216,6 +347,14 @@ fun TotalCostsScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Graph of costs per service type, colored by car
+            TypeCostsGraph(
+                data = typeCostData,
+                vehicles = vehicles
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
