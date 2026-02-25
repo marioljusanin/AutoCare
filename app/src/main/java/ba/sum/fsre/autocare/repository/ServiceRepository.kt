@@ -23,4 +23,7 @@ class ServiceRepository(private val serviceDao: ServiceDao) {
     fun getServiceByID(id:Int): Flow<Service>{
         return serviceDao.getServiceByID(id)
     }
+
+    fun getServicesByVehicleId(vehicleId: Int): Flow<List<Service>> =
+        serviceDao.getServicesByVehicleId(vehicleId)
 }

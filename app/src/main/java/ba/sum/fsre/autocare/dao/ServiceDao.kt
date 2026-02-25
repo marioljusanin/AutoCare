@@ -28,4 +28,7 @@ abstract class ServiceDao {
     @Query("Select *from `service` where serviceID=:id")
     abstract fun getServiceByID(id:Int): Flow<Service>
 
+    @Query("Select * from `service` where vehicleID = :vehicleId order by date desc")
+    abstract fun getServicesByVehicleId(vehicleId: Int): Flow<List<Service>>
+
 }

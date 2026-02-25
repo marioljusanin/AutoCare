@@ -73,9 +73,9 @@ fun AddServiceScreen(
             )
 
             Spacer(Modifier.height(10.dp))
-            AddService("Type",
-                viewModel.typeServiceState,
-                {viewModel.onTypeServiceChanged(it)}
+            ServiceTypeDropDown(
+                selectedType = viewModel.typeServiceState,
+                onTypeSelected = { viewModel.onTypeServiceChanged(it) }
             )
 
             Spacer(Modifier.height(10.dp))
@@ -95,6 +95,10 @@ fun AddServiceScreen(
             Button(onClick = {
                 if (vID == null) {
                     scope.launch { snackbarHostState.showSnackbar("Select vehicle first") }
+                    return@Button
+                }
+                if (viewModel.typeServiceState.isBlank()) {
+                    scope.launch { snackbarHostState.showSnackbar("Select service type") }
                     return@Button
                 }
 
@@ -140,6 +144,53 @@ fun AddService(
 
 }
 
+private val SERVICE_TYPES = listOf(
+    "Mali Servis",
+    "Veliki Servis",
+    "Popravak",
+    "Gorivo"
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ServiceTypeDropDown(
+    selectedType: String,
+    onTypeSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedType,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Service type") },
+            placeholder = { Text("Select type") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            },
+            modifier = Modifier.menuAnchor().fillMaxWidth()
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            SERVICE_TYPES.forEach { type ->
+                DropdownMenuItem(
+                    text = { Text(type) },
+                    onClick = {
+                        onTypeSelected(type)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehicleDropDown(
@@ -167,9 +218,9 @@ fun VehicleDropDown(
             },
             modifier = Modifier.menuAnchor().fillMaxWidth()
         )
-        ExposedDropdownMenu(
+        DropdownMenu(
             expanded = expanded,
-            onDismissRequest = {expanded = false}
+            onDismissRequest = { expanded = false }
         ) {
             vehicles.forEach {
                 vehicle ->

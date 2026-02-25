@@ -47,19 +47,8 @@ class ServiceViewModel(
         selectedVehicleByID = id
     }
 
-    lateinit var getAllVehicle: Flow<List<Vehicle>>
-    init{
-        viewModelScope.launch{
-            getAllVehicle= vehicleRepository.getAllVehicle()
-        }
-    }
-    lateinit var getAllService: Flow<List<Service>>
-
-    init{
-        viewModelScope.launch{
-            getAllService = serviceRepository.getAllService()
-        }
-    }
+    val getAllVehicle: Flow<List<Vehicle>> = vehicleRepository.getAllVehicle()
+    val getAllService: Flow<List<Service>> = serviceRepository.getAllService()
 
     fun addService(service: Service){
         viewModelScope.launch(Dispatchers.IO){
@@ -82,4 +71,9 @@ class ServiceViewModel(
     fun getServiceByID(id: Int): Flow<Service>{
         return serviceRepository.getServiceByID(id)
     }
+
+    fun getServicesByVehicleId(vehicleId: Int): Flow<List<Service>> =
+        serviceRepository.getServicesByVehicleId(vehicleId)
+
+    fun getVehicleByID(id: Int): Flow<Vehicle> = vehicleRepository.getVehicleByID(id)
 }
